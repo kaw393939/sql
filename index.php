@@ -1,7 +1,7 @@
 <?php
 $dsn = 'mysql:dbname=kwilliam;host=sql2.njit.edu';
 $user = 'kwilliam';
-$password = 'pcc8iPU0';
+$password = 'ma9euXF1H';
 
 try {
     $dbh = new PDO($dsn, $user, $password);
@@ -10,7 +10,7 @@ try {
   echo 'Connection failed: ' . $e->getMessage();
 }
 
-$sql = "CREATE TABLE users1 (
+$sql = "CREATE TABLE users10 (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
         firstname VARCHAR(30) NOT NULL,
 	lastname VARCHAR(30) NOT NULL,
