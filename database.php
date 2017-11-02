@@ -63,14 +63,21 @@ class collection {
 
     }
 
-    static protected function loadCollection() {
+     protected function loadCollection() {
         $db = dbConn::getConnection();
         $table = self::$table;
         $class = self::$modelClass;
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 
-        $stmt = $db->prepare("SELECT * FROM $table");
+        $stmt = $db->prepare("SELECT * FROM :tableName");
+
+
+        $stmt->execute(array(':tableName'=> get_class($this)));
+
+
+
+        //$records = $db->prepare("SELECT * FROM $table")->setFetchMode(PDO::FETCH_CLASS, $class)->fetchAll();
 
 
         $stmt->setFetchMode(PDO::FETCH_CLASS, $class);

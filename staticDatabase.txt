@@ -1,0 +1,106 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: kwilliams
+ * Date: 10/31/17
+ * Time: 9:48 PM
+ */
+
+
+/**
+ * Created by PhpStorm.
+ * User: kwilliams
+ * Date: 10/30/17
+ * Time: 10:37 PM
+ */
+//turn on debugging messages
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
+
+define('DATABASE', 'kwilliam');
+define('USERNAME', 'kwilliam');
+define('PASSWORD', 'ma9euXF1H');
+define('CONNECTION', 'sql2.njit.edu');
+
+class dbConn{
+
+    //variable to hold connection object.
+    protected static $db;
+
+    //private construct - class cannot be instatiated externally.
+    private function __construct() {
+
+        try {
+            // assign PDO object to db variable
+            self::$db = new PDO( 'mysql:host=' . CONNECTION .';dbname=' . DATABASE, USERNAME, PASSWORD );
+            self::$db->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+        }
+        catch (PDOException $e) {
+            //Output error - would normally log this to error file rather than output to user.
+            echo "Connection Error: " . $e->getMessage();
+        }
+
+    }
+
+    // get connection function. Static method - accessible without instantiation
+    public static function getConnection() {
+
+        //Guarantees single instance, if no connection object exists then create one.
+        if (!self::$db) {
+            //new connection object.
+            new dbConn();
+        }
+
+        //return connection.
+        return self::$db;
+    }
+}
+
+
+class collection {
+
+//this is a static method so you can load all the records
+    static public function findAll() {
+//get the connection with the singleton
+        $db = dbConn::getConnection();
+//This sets the table for the query to the name of the static class being used to run find all
+        $tableName = get_called_class();
+//this is making the select query using the name of the table
+        $sql = 'SELECT * FROM ' . $tableName;
+//this loads the query into the statement object that will run the query
+        $statement = $db->prepare($sql);
+//this runs the query
+        $statement->execute();
+//this gets the name of the model from the child class that the static method was called from
+        $class = static::$modelName;
+//this fetches the records as the class that is required for the record/table type
+        $statement->setFetchMode(PDO::FETCH_CLASS, $class);
+//this loads the records into the record set
+        $recordsSet =  $statement->fetchAll();
+//this returns the record set
+        return $recordsSet;
+    }
+}
+
+
+//By creating a  class called the same name as the table, the collection class can build the SQL query
+class accounts extends collection {
+    protected static $modelName = 'account';
+}
+
+//By testing the design of the collection class using two different classes we prove that the collection class is a proper abstraction of our basic database functionality for a select statement
+class todos extends collection {
+    protected static $modelName = 'todo';
+}
+//we need these classes to hold the records returned in the query because we are returning objects.  We want to have objects so that eventually we can add insert update and delete to the model.
+//We are using the active record pattern for our database access, which binds each model to one row in our database.
+class account {}
+class todo {}
+
+//this is how to use the class to find ALL records
+$records = accounts::findAll();
+print_r($records);
+
+$records = todos::findAll();
+print_r($records);
