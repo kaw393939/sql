@@ -59,7 +59,11 @@ class dbConn{
 
 
 class collection {
+    static public function create() {
+      $model = new static::$modelName;
 
+      return $model;
+    }
 
     static public function findAll() {
 
@@ -96,7 +100,18 @@ class todos extends collection {
 }
 class model {
     protected $tableName;
-    public function save() {
+    public function save()
+    {
+
+        if ($this->id = '') {
+
+            $sql = $this->insert();
+        } else {
+            $sql = $this->update();
+        }
+        $db = dbConn::getConnection();
+        $statement = $db->prepare($sql);
+        $statement->execute();
 
         $tableName = get_called_class();
 
@@ -107,8 +122,13 @@ class model {
 
         echo 'I just saved record: ' . $this->id;
     }
-
-    public function update() {
+    private function insert() {
+        $sql = 'sometthing';
+        return $sql;
+    }
+    private function update() {
+        $sql = 'sometthing';
+        return $sql;
         echo 'I just updated record' . $this->id;
     }
     public function delete() {
@@ -135,6 +155,7 @@ class todo extends model {
     public function __construct()
     {
         $this->tableName = 'todos';
+	
     }
 }
 // this would be the method to put in the index page for accounts
@@ -156,7 +177,7 @@ $record = todos::findOne(1);
 
 
 
-$record->save();
+// $record->save();
 
 
 //$record = accounts::findOne(1);
@@ -166,9 +187,11 @@ $record->save();
 $record = new todo();
 $record->message = 'some task';
 $record->isdone = 0;
-$record->save();
+//$record->save();
 
 print_r($record);
 
+$record = todos::create();
+print_r($record);
 
 
